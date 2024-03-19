@@ -1,0 +1,87 @@
+# Runs unit tests, type checking, and linting
+name: Validate
+
+on:
+  push:
+    branches:
+        - "*"
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  # Run unit tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    # Startup dev db for unit tests
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Start db 
+        run: |
+          docker compose up --build -d 
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Run tests
+        run: |
+          python -m pytest tests --junitxml=tests.xml
+  
+  # Lint
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8 Flake8-pyproject
+      - name: Lint
+        run: |
+          python -m flake8 --toml-config pyproject.toml src
+  
+  # Type check
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.12"
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Type Check
+        run: |
+          python -m pyright src
+          

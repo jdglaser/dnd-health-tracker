@@ -13,6 +13,7 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
+    container: python
 
     # Startup dev db for unit tests
     services:

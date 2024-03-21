@@ -16,3 +16,6 @@ line-length = 120
 [tool.flake8]
 max-line-length = 120
 extend-ignore = ["E203", "E701"] # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#flake8
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

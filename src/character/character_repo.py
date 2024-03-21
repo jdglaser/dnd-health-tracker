@@ -5,11 +5,11 @@ from src.character.exceptions import CharacterNotFoundException, CharacterRepoEx
 from src.character.models import (
     Character,
     CharacterClass,
+    CharacterHitpoints,
     CharacterStats,
     Defense,
     Item,
     ItemModifier,
-    TemporaryHitpoints,
 )
 from src.log_config import get_logger
 
@@ -20,34 +20,56 @@ class CharacterRepo:
     def __init__(self, db: AsyncCursor) -> None:
         self.db = db
 
-    async def update_hitpoints(self, character_id: int): ...
+    async def update_hitpoints(self, character_id: int, hitpoints: CharacterHitpoints):
+        updated_res = await (
+            await self.db.execute(
+                """
+                UPDATE operational.character_hitpoints
+                SET current_hit_points = %(current_hit_points)s,
+                    hit_point_max = %(hit_point_max)s,
+                    temporary_hit_points = %(temporary_hit_points)s
+                WHERE id = %(character_id)s
+                RETURNING id
+                """,
+                {"character_id": character_id} | msgspec.structs.asdict(hitpoints),
+            )
+        ).fetchone()
 
-    async def update_temporary_hitpoints(self, character_id: int, temporary_hitpoints: TemporaryHitpoints): ...
+        if not updated_res:
+            raise CharacterNotFoundException(f"Cannot find character with id {character_id}")
+
+    async def update_temporary_hitpoints(self, character_id: int): ...
 
     async def get_character(self, character_id: int):
         character_res = await (
             await self.db.execute(
                 """
-                SELECT name, level, hit_points
-                FROM operational.character
-                WHERE id = %(id)s
+                SELECT name,
+                    level,
+                    hit_point_max,
+                    current_hit_points,
+                    temporary_hit_points
+                FROM operational.character c
+                JOIN operational.character_hitpoints ch ON c.id = ch.character_id
+                WHERE c.id = %(id)s
                 """,
                 {"id": character_id},
             )
         ).fetchone()
 
         if not character_res:
-            raise CharacterNotFoundException(f"Cannot find character for character id '{character_id}'")
+            raise CharacterNotFoundException(f"Cannot find character for character id {character_id}")
 
         character_classes = await self.get_character_classes(character_id=character_id)
         character_stats = await self.get_character_stats(character_id=character_id)
         character_items = await self.get_character_items(character_id=character_id)
         character_defenses = await self.get_character_defenses(character_id=character_id)
 
+        name, level = character_res.pop("name"), character_res.pop("level")
         return Character(
-            name=character_res["name"],
-            level=character_res["level"],
-            hit_points=character_res["hit_points"],
+            name=name,
+            level=level,
+            hit_points=msgspec.convert(character_res, CharacterHitpoints),
             classes=character_classes,
             stats=character_stats,
             items=character_items,
@@ -98,7 +120,7 @@ class CharacterRepo:
         ).fetchall()
 
         if not stats_res:
-            raise CharacterNotFoundException(f"Cannot find character stats for character id '{character_id}'")
+            raise CharacterNotFoundException(f"Cannot find character stats for character id {character_id}")
 
         stat_dict = {r["stat"]: r["value"] for r in stats_res}
         return msgspec.convert(stat_dict, CharacterStats)
@@ -141,15 +163,14 @@ class CharacterRepo:
             await self.db.execute(
                 """
                 INSERT INTO operational.character
-                (name, level, hit_points)
+                (name, level)
                 VALUES
-                (%(name)s, %(level)s, %(hit_points)s)
+                (%(name)s, %(level)s)
                 RETURNING id
                 """,
                 {
                     "name": character.name,
                     "level": character.level,
-                    "hit_points": character.hit_points,
                 },
             )
         ).fetchone()
@@ -157,13 +178,26 @@ class CharacterRepo:
         if not character_id_res:
             raise CharacterRepoException(f"Unable to resolve inserted character ID for character: {character}")
 
-        character_id = character_id_res[0]
+        character_id = character_id_res["id"]
 
+        await self.insert_character_hit_points(character_id=character_id, hit_points=character.hit_points)
         await self.insert_character_classes(character_id=character_id, classes=character.classes)
         await self.insert_character_stat(character_id=character_id, character_stats=character.stats)
         for item in character.items:
             await self.insert_character_item(character_id=character_id, character_item=item)
         await self.insert_character_defenses(character_id=character_id, defenses=character.defenses)
+
+    async def insert_character_hit_points(self, character_id: int, hit_points: CharacterHitpoints):
+        LOG.info(f"Inserting character hitpoints for character id {character_id}")
+        await self.db.execute(
+            """
+            INSERT INTO operational.character_hitpoints
+            (character_id, hit_point_max, current_hit_points, temporary_hit_points)
+            VALUES
+            (%(character_id)s, %(hit_point_max)s, %(current_hit_points)s, %(temporary_hit_points)s)
+            """,
+            {"character_id": character_id} | msgspec.structs.asdict(hit_points),
+        )
 
     async def insert_character_classes(self, character_id: int, classes: list[CharacterClass]):
         LOG.info(f"Inserting {len(classes)} character classes for character id {character_id}")
@@ -208,9 +242,9 @@ class CharacterRepo:
         if not item_id_res:
             raise CharacterRepoException(f"Unable to resolve id for item {character_item}")
 
-        item_id = item_id_res[0]
+        item_id = item_id_res["id"]
 
-        LOG.info(f"Inserting character item modifier for character item id '{item_id}'")
+        LOG.info(f"Inserting character item modifier for character item id {item_id}")
         await self.db.execute(
             """
             INSERT INTO operational.character_item_modifier

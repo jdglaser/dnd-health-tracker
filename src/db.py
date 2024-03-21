@@ -8,7 +8,6 @@ import psycopg
 from litestar import Litestar
 from litestar.datastructures import State
 from psycopg import AsyncConnection, AsyncCursor, Cursor
-from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 
 from src import app_config
@@ -16,6 +15,7 @@ from src.character.character_repo import CharacterRepo
 from src.character.models import Character
 from src.exceptions import AppError
 from src.log_config import get_logger
+from src.utils import dict_row_camel
 
 LOG = get_logger(__name__)
 
@@ -80,20 +80,22 @@ async def provide_db(db_conn: AsyncConnection):
     """
     Provides a database cursor object from a database connection object
     """
-    async with db_conn.cursor(row_factory=dict_row) as cur:
+    async with db_conn.cursor(row_factory=dict_row_camel) as cur:
         yield cur
 
 
-async def insert_test_data(app: Litestar):
+async def insert_test_data():
     """
     App startup function for inserting initial data
     """
     with open(app_config.TEST_DATA_PATH, "r") as fp:
         test_data = json.load(fp)
 
+    test_data["hitPoints"] = {"hitPointMax": test_data["hitPoints"], "currentHitPoints": test_data["hitPoints"]}
+
     character = msgspec.convert(test_data, Character)
     async with await psycopg.AsyncConnection.connect(get_conn_info().to_conn_str()) as conn:
-        async with conn.cursor() as cur:
+        async with conn.cursor(row_factory=dict_row_camel) as cur:
             character_repo = CharacterRepo(cur)
             await character_repo.insert_character(character=character)
 
@@ -110,7 +112,7 @@ def run_migration_script(path: Path, cur: Cursor):
 
 # In a real app, we'd use a database migration tool like Flyway to run proper migrations, but for this exercise, a
 # simple setup and teardown script will do
-async def migrate_db(app: Litestar):
+async def migrate_db():
     """
     App startup function to setup the db
     """
@@ -119,7 +121,7 @@ async def migrate_db(app: Litestar):
             run_migration_script(app_config.MIGRATION_PATH / "setup.sql", cur)
 
 
-def teardown_db(app: Litestar):
+async def teardown_db():
     """
     App shutdown function to teardown the db
     """

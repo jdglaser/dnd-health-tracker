@@ -51,16 +51,16 @@ class Defense(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     defense_type: str = msgspec.field(name="defense")
 
 
-class TemporaryHitpoints(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
-    max_value: int
-    current_value: int
+class CharacterHitpoints(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
+    hit_point_max: int
+    current_hit_points: int
+    temporary_hit_points: Optional[int] = None
 
 
 class Character(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     name: str
     level: int
-    hit_points: int
-    temporary_hitpoints: Optional[TemporaryHitpoints] = None
+    hit_points: CharacterHitpoints
     classes: list[CharacterClass]
     stats: CharacterStats
     items: list[Item]

@@ -1,1 +1,1 @@
-DROP SCHEMA operational CASCADE;
+DROP SCHEMA IF EXISTS operational CASCADE;

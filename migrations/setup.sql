@@ -3,10 +3,15 @@ CREATE SCHEMA IF NOT EXISTS operational;
 CREATE TABLE IF NOT EXISTS operational.character (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    level INT NOT NULL DEFAULT 1,
-    hit_points INT NOT NULL,
-    temporary_hitpoints_max INT,
-    temporary_hitpoints_current INT
+    level INT NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS operational.character_hitpoints (
+    id SERIAL PRIMARY KEY,
+    character_id INT NOT NULL REFERENCES operational.character(id),
+    hit_point_max INT NOT NULL,
+    current_hit_points INT NOT NULL,
+    temporary_hit_points INT
 );
 
 CREATE TABLE IF NOT EXISTS operational.character_class (

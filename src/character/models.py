@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 import msgspec
 
@@ -50,10 +51,16 @@ class Defense(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     defense_type: str = msgspec.field(name="defense")
 
 
+class TemporaryHitpoints(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
+    max_value: int
+    current_value: int
+
+
 class Character(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     name: str
     level: int
     hit_points: int
+    temporary_hitpoints: Optional[TemporaryHitpoints] = None
     classes: list[CharacterClass]
     stats: CharacterStats
     items: list[Item]

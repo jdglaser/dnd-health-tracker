@@ -4,7 +4,9 @@ CREATE TABLE IF NOT EXISTS operational.character (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     level INT NOT NULL DEFAULT 1,
-    hit_points INT NOT NULL
+    hit_points INT NOT NULL,
+    temporary_hitpoints_max INT,
+    temporary_hitpoints_current INT
 );
 
 CREATE TABLE IF NOT EXISTS operational.character_class (

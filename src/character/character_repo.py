@@ -2,7 +2,15 @@ import msgspec
 from psycopg import AsyncCursor
 
 from src.character.exceptions import CharacterNotFoundException, CharacterRepoException
-from src.character.models import Character, CharacterClass, CharacterStats, Defense, Item, ItemModifier
+from src.character.models import (
+    Character,
+    CharacterClass,
+    CharacterStats,
+    Defense,
+    Item,
+    ItemModifier,
+    TemporaryHitpoints,
+)
 from src.log_config import get_logger
 
 LOG = get_logger(__name__)
@@ -12,7 +20,9 @@ class CharacterRepo:
     def __init__(self, db: AsyncCursor) -> None:
         self.db = db
 
-    async def search_for_character(self, name: str): ...
+    async def update_hitpoints(self, character_id: int): ...
+
+    async def update_temporary_hitpoints(self, character_id: int, temporary_hitpoints: TemporaryHitpoints): ...
 
     async def get_character(self, character_id: int):
         character_res = await (
@@ -55,7 +65,6 @@ class CharacterRepo:
                 {"id": character_id},
             )
         ).fetchall()
-        print(res)
         return msgspec.convert(
             res,
             list[CharacterClass],
@@ -92,14 +101,14 @@ class CharacterRepo:
             raise CharacterNotFoundException(f"Cannot find character stats for character id '{character_id}'")
 
         stat_dict = {r["stat"]: r["value"] for r in stats_res}
-        print(stats_res)
         return msgspec.convert(stat_dict, CharacterStats)
 
     async def get_character_items(self, character_id: int):
         item_res = await (
             await self.db.execute(
                 """
-                SELECT ci.id, ci.name, cim.affected_object as "affectedObject", cim.affected_value as "affectedValue", cim.value
+                SELECT ci.id, ci.name, cim.affected_object as "affectedObject",
+                cim.affected_value as "affectedValue", cim.value
                 FROM operational.character_item ci
                 JOIN operational.character_item_modifier cim ON ci.id = cim.character_item_id
                 WHERE character_id = %(id)s
@@ -110,8 +119,6 @@ class CharacterRepo:
 
         if not item_res:
             return []
-
-        print(item_res)
 
         items: list[Item] = []
         for item in item_res:

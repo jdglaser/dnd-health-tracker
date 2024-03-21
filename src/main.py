@@ -6,7 +6,7 @@ from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
 
 from src import app_config
-from src.db import DB, db_connection
+from src.db import DB, db_connection, insert_test_data, migrate_db, teardown_db
 from src.deps import provide_dependencies
 from src.exceptions import AppError, app_exception_handler
 
@@ -47,6 +47,10 @@ app = Litestar(
     route_handlers=[api_router],
     # Make a DB connection pool available for the lifespan of the application
     lifespan=[db_connection],
+    # Migrate db and insert test data on startup. Only insert test data in local dev
+    on_startup=[migrate_db] + ([insert_test_data] if app_config.ENV == app_config.Environment.LOCAL_DEV else []),
+    # Only run db teardown in local dev
+    on_shutdown=[teardown_db] if app_config.ENV == app_config.Environment.LOCAL_DEV else [],
     # Setup dependencies
     dependencies=provide_dependencies(),
     # Base exception handler for application

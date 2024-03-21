@@ -2,6 +2,7 @@
 import logging
 import os
 from enum import Enum
+from pathlib import Path
 
 
 class Environment(Enum):
@@ -18,6 +19,8 @@ PROJECT_NAME = "dnd-health-tracker"
 VERSION = "1.0.0"
 API_MAJOR_VERSION = f"v{VERSION.split('.')[0]}"
 API_BASE_URL = f"/api/{API_MAJOR_VERSION}"
+MIGRATION_PATH = Path("./migrations")
+TEST_DATA_PATH = Path("./briv.json")
 
 
 # DB connection info

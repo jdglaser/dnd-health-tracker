@@ -22,23 +22,18 @@ CREATE TABLE IF NOT EXISTS operational.character_stat (
     value INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS operational.item (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS operational.item_modifier (
-    id SERIAL PRIMARY KEY,
-    item_id INT REFERENCES operational.item(id),
-    affected_object TEXT NOT NULL,
-    affected_value TEXT NOT NULL,
-    value INT NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS operational.character_item (
     id SERIAL PRIMARY KEY,
     character_id INT REFERENCES operational.character(id),
-    item_id INT REFERENCES operational.item(id)
+    name TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS operational.character_item_modifier (
+    id SERIAL PRIMARY KEY,
+    character_item_id INT REFERENCES operational.character_item(id),
+    affected_object TEXT NOT NULL,
+    affected_value TEXT NOT NULL,
+    value INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS operational.character_defense (

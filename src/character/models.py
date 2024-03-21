@@ -1,3 +1,5 @@
+from enum import Enum
+
 import msgspec
 
 
@@ -27,8 +29,24 @@ class Item(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     modifier: ItemModifier
 
 
+class DamageType(Enum):
+    BLUDGEONING = "bludgeoning"
+    PIERCING = "piercing"
+    SLASHING = "slashing"
+    FIRE = "fire"
+    COLD = "cold"
+    ACID = "acid"
+    THUNDER = "thunder"
+    LIGHTNING = "lightning"
+    POISON = "poison"
+    RADIANT = "radiant"
+    NECROTIC = "necrotic"
+    PSYCHIC = "psychic"
+    FORCE = "force"
+
+
 class Defense(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
-    damage_type: str = msgspec.field(name="type")
+    damage_type: DamageType = msgspec.field(name="type")
     defense_type: str = msgspec.field(name="defense")
 
 

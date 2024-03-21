@@ -6,9 +6,11 @@ from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
 
 from src import app_config
-from src.db import DB, db_connection, insert_test_data, migrate_db, teardown_db
+from src.character.character_repo import CharacterRepo
+from src.character.models import Character
+from src.db import db_connection, insert_test_data, migrate_db, teardown_db
 from src.deps import provide_dependencies
-from src.exceptions import AppError, app_exception_handler
+from src.exceptions import app_exception_handler
 
 
 # Define primary health route
@@ -17,20 +19,9 @@ async def health() -> dict[str, Any]:
     return {"status": "pass", "description": "Application is healthy", "environment": app_config.ENV}
 
 
-@get("/bad")
-async def test_exception() -> dict[str, Any]:
-    raise AppError("Ah!")
-
-
-@get("/data")
-async def test_database(db: DB) -> list[dict[str, Any]]:
-    print("HERE1")
-    res = await db.execute("Select 1 as a, 2 as b, 3 as c, 'hello' as d")
-    print("HERE2")
-    res_data = await res.fetchall()
-    print("HERE3")
-    print(res_data)
-    return res_data
+@get("/test")
+async def test_me(character_repo: CharacterRepo) -> Character:
+    return await character_repo.get_character(1)
 
 
 # Customize the path where OpenAPI docs live
@@ -39,7 +30,7 @@ class CustomOpenApiController(OpenAPIController):
 
 
 # Main api router for the application
-api_router = Router(app_config.API_BASE_URL, route_handlers=[health, test_exception, test_database])
+api_router = Router(app_config.API_BASE_URL, route_handlers=[health, test_me])
 
 # Setup main application
 app = Litestar(

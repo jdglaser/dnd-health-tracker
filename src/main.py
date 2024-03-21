@@ -6,11 +6,15 @@ from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
 
 from src import app_config
+from src.character.character_controller import CharacterController
 from src.character.character_repo import CharacterRepo
 from src.character.models import Character
 from src.db import db_connection, insert_test_data, migrate_db, teardown_db
 from src.deps import provide_dependencies
 from src.exceptions import app_exception_handler
+from src.log_config import get_logger
+
+LOG = get_logger(__name__)
 
 
 # Define primary health route
@@ -30,7 +34,14 @@ class CustomOpenApiController(OpenAPIController):
 
 
 # Main api router for the application
-api_router = Router(app_config.API_BASE_URL, route_handlers=[health, test_me])
+api_router = Router(app_config.API_BASE_URL, route_handlers=[health, CharacterController])
+
+
+def startup_log():
+    app_url = f"http://{app_config.HOST}:{app_config.PORT}{app_config.API_BASE_URL}"
+    LOG.info(f"Started application at {app_url}")
+    LOG.info(f"See docs at {app_url}/docs/swagger")
+
 
 # Setup main application
 app = Litestar(
@@ -39,7 +50,9 @@ app = Litestar(
     # Make a DB connection pool available for the lifespan of the application
     lifespan=[db_connection],
     # Migrate db and insert test data on startup. Only insert test data in local dev
-    on_startup=[migrate_db] + ([insert_test_data] if app_config.ENV == app_config.Environment.LOCAL_DEV else []),
+    on_startup=[migrate_db]
+    + ([insert_test_data] if app_config.ENV == app_config.Environment.LOCAL_DEV else [])
+    + [startup_log],
     # Only run db teardown in local dev
     on_shutdown=[teardown_db] if app_config.ENV == app_config.Environment.LOCAL_DEV else [],
     # Setup dependencies

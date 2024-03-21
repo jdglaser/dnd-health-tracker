@@ -65,3 +65,15 @@ class Character(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     stats: CharacterStats
     items: list[Item]
     defenses: list[Defense]
+
+
+class DealDamageRequest(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
+    amount: int
+
+
+class HealRequest(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
+    amount: int
+
+
+class AssignTemporaryHitPointsRequest(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
+    amount: int

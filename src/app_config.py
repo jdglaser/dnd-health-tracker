@@ -21,6 +21,8 @@ API_MAJOR_VERSION = f"v{VERSION.split('.')[0]}"
 API_BASE_URL = f"/api/{API_MAJOR_VERSION}"
 MIGRATION_PATH = Path("./migrations")
 TEST_DATA_PATH = Path("./briv.json")
+HOST = "localhost"
+PORT = 3000
 
 
 # DB connection info

@@ -6,7 +6,7 @@ import traceback
 import click
 from dateutil import tz
 
-from src import app_config
+from src.common import app_config
 
 
 class ColorFormatter(logging.Formatter):

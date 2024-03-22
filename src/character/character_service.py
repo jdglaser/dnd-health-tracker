@@ -6,8 +6,8 @@ from psycopg import AsyncCursor
 
 from src.character.character_repo import CharacterRepo
 from src.character.models import Character, DamageType, Defense, DefenseType
-from src.log_config import get_logger
-from src.utils import acquire_lock
+from src.common.log_config import get_logger
+from src.common.utils import acquire_lock
 
 LOG = get_logger(__name__)
 

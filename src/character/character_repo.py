@@ -11,7 +11,7 @@ from src.character.models import (
     Item,
     ItemModifier,
 )
-from src.log_config import get_logger
+from src.common.log_config import get_logger
 
 LOG = get_logger(__name__)
 
@@ -36,7 +36,7 @@ class CharacterRepo:
         ).fetchone()
 
         if not updated_res:
-            raise CharacterNotFoundException(f"Cannot find character with id {character_id}")
+            raise CharacterNotFoundException(f"Cannot find character with id {character_id}", character_id=character_id)
 
         return await self.get_character(character_id=character_id)
 
@@ -58,7 +58,9 @@ class CharacterRepo:
         ).fetchone()
 
         if not character_res:
-            raise CharacterNotFoundException(f"Cannot find character for character id {character_id}")
+            raise CharacterNotFoundException(
+                f"Cannot find character for character id {character_id}", character_id=character_id
+            )
 
         character_classes = await self.get_character_classes(character_id=character_id)
         character_stats = await self.get_character_stats(character_id=character_id)
@@ -120,7 +122,9 @@ class CharacterRepo:
         ).fetchall()
 
         if not stats_res:
-            raise CharacterNotFoundException(f"Cannot find character stats for character id {character_id}")
+            raise CharacterNotFoundException(
+                f"Cannot find character stats for character id {character_id}", character_id=character_id
+            )
 
         stat_dict = {r["stat"]: r["value"] for r in stats_res}
         return msgspec.convert(stat_dict, CharacterStats)

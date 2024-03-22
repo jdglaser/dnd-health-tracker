@@ -2,7 +2,7 @@ from typing import Optional
 
 import msgspec
 
-from src.utils import CaseInsensitiveEnum
+from src.common.utils import CaseInsensitiveEnum
 
 
 class CharacterClass(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
@@ -75,6 +75,7 @@ class Character(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
 
 class DealDamageRequest(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     amount: int
+    damage_type: DamageType
 
 
 class HealRequest(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):

@@ -1,17 +1,19 @@
 services:
-  # web:
-  #   build: .
-  #   ports:
-  #     - "8080:8080"
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
   db:
     image: postgres
     environment:
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "foo"]
+      test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 1s
       timeout: 5s
       retries: 10

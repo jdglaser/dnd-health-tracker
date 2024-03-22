@@ -10,12 +10,12 @@ from litestar.datastructures import State
 from psycopg import AsyncConnection, AsyncCursor, Cursor
 from psycopg_pool import AsyncConnectionPool
 
-from src import app_config
 from src.character.character_repo import CharacterRepo
 from src.character.models import Character
-from src.exceptions import AppError
-from src.log_config import get_logger
-from src.utils import dict_row_camel
+from src.common import app_config
+from src.common.app_error import AppError
+from src.common.log_config import get_logger
+from src.common.utils import dict_row_camel
 
 LOG = get_logger(__name__)
 

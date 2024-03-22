@@ -2,7 +2,7 @@ from litestar.di import Provide
 
 from src.character.character_repo import CharacterRepo
 from src.character.character_service import CharacterService
-from src.db import provide_db, provide_db_conn
+from src.common.db import provide_db, provide_db_conn
 
 
 def provide_dependencies():

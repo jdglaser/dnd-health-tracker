@@ -7,7 +7,7 @@ from psycopg.cursor import BaseCursor
 from psycopg.pq.abc import PGresult
 from psycopg.rows import COMMAND_OK, SINGLE_TUPLE, TUPLES_OK, DictRow, RowMaker
 
-from src.log_config import get_logger
+from src.common.log_config import get_logger
 
 LOG = get_logger(__name__)
 

@@ -3,9 +3,10 @@ from typing import Any, Optional
 import msgspec
 from litestar import Request, Response
 from litestar.exceptions import HTTPException
-from litestar.status_codes import HTTP_500_INTERNAL_SERVER_ERROR
+from litestar.status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
-from src.log_config import get_logger
+from src.character.exceptions import CharacterNotFoundException
+from src.common.log_config import get_logger
 
 LOG = get_logger(__name__)
 
@@ -24,9 +25,6 @@ class ExceptionResponse(Response[Any]):
         )
 
 
-class AppError(Exception): ...
-
-
 def app_exception_handler(request: Request[Any, Any, Any], exception: Exception) -> ExceptionResponse:
     match exception:
         case HTTPException():
@@ -35,6 +33,12 @@ def app_exception_handler(request: Request[Any, Any, Any], exception: Exception)
                     status_code=exception.status_code,
                     detail=exception.detail,
                     extra=exception.extra,
+                )
+            )
+        case CharacterNotFoundException():
+            response = ExceptionResponse(
+                ExceptionResponseBody(
+                    status_code=HTTP_404_NOT_FOUND, detail=f"Character id {exception.character_id} not found"
                 )
             )
         case _:

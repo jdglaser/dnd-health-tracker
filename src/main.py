@@ -5,27 +5,20 @@ from litestar import Litestar, Router, get
 from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig, OpenAPIController
 
-from src import app_config
 from src.character.character_controller import CharacterController
-from src.character.character_repo import CharacterRepo
-from src.character.models import Character
-from src.db import db_connection, insert_test_data, migrate_db, teardown_db
-from src.deps import provide_dependencies
-from src.exceptions import app_exception_handler
-from src.log_config import get_logger
+from src.common import app_config
+from src.common.db import db_connection, insert_test_data, migrate_db, teardown_db
+from src.common.deps import provide_dependencies
+from src.common.exceptions import app_exception_handler
+from src.common.log_config import get_logger
 
 LOG = get_logger(__name__)
 
 
-# Define primary health route
+# Define health route for checking server status
 @get("/health")
 async def health() -> dict[str, Any]:
     return {"status": "pass", "description": "Application is healthy", "environment": app_config.ENV}
-
-
-@get("/test")
-async def test_me(character_repo: CharacterRepo) -> Character:
-    return await character_repo.get_character(1)
 
 
 # Customize the path where OpenAPI docs live

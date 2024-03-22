@@ -4,8 +4,8 @@ from psycopg import AsyncCursor
 
 from src.character.character_repo import CharacterRepo
 from src.character.character_service import CharacterService
-from src.db import get_conn_info, insert_test_data, migrate_db, teardown_db
-from src.utils import dict_row_camel
+from src.common.db import get_conn_info, insert_test_data, migrate_db, teardown_db
+from src.common.utils import dict_row_camel
 
 
 @pytest.fixture

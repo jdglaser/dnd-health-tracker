@@ -1,9 +1,33 @@
+import hashlib
+from enum import Enum
 from typing import Any, NoReturn, Optional, Sequence
 
-from psycopg import InterfaceError
+from psycopg import AsyncCursor, InterfaceError
 from psycopg.cursor import BaseCursor
 from psycopg.pq.abc import PGresult
 from psycopg.rows import COMMAND_OK, SINGLE_TUPLE, TUPLES_OK, DictRow, RowMaker
+
+from src.log_config import get_logger
+
+LOG = get_logger(__name__)
+
+
+class CaseInsensitiveEnum(Enum):
+    @classmethod
+    def _missing_(cls, value: object):
+        for member in cls:
+            if member.name.lower() == str(value).lower():
+                return member
+
+
+async def acquire_lock(key: str, cur: AsyncCursor):
+    key_bytes: bytes = key.encode("utf-8")
+    m = hashlib.sha256()
+    m.update(key_bytes)
+    key_int = int.from_bytes(m.digest()[:8], byteorder="big", signed=True)
+    LOG.info(f"Attempting to retrieve lock {key} ({key_int})")
+    await cur.execute("SELECT pg_advisory_xact_lock(%(hash)s)", {"hash": key_int})
+    LOG.info(f"Successfully retrieved lock {key} ({key_int})")
 
 
 def snake_to_camel(string: str):

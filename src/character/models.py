@@ -1,7 +1,8 @@
-from enum import Enum
 from typing import Optional
 
 import msgspec
+
+from src.utils import CaseInsensitiveEnum
 
 
 class CharacterClass(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
@@ -30,7 +31,7 @@ class Item(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     modifier: ItemModifier
 
 
-class DamageType(Enum):
+class DamageType(CaseInsensitiveEnum):
     BLUDGEONING = "bludgeoning"
     PIERCING = "piercing"
     SLASHING = "slashing"
@@ -46,9 +47,14 @@ class DamageType(Enum):
     FORCE = "force"
 
 
+class DefenseType(CaseInsensitiveEnum):
+    RESISTANCE = "resistance"
+    IMMUNITY = "immunity"
+
+
 class Defense(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     damage_type: DamageType = msgspec.field(name="type")
-    defense_type: str = msgspec.field(name="defense")
+    defense_type: DefenseType = msgspec.field(name="defense")
 
 
 class CharacterHitpoints(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):

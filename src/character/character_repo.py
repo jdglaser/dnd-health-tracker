@@ -20,7 +20,7 @@ class CharacterRepo:
     def __init__(self, db: AsyncCursor) -> None:
         self.db = db
 
-    async def update_hitpoints(self, character_id: int, hitpoints: CharacterHitpoints):
+    async def update_hitpoints(self, character_id: int, hitpoints: CharacterHitpoints) -> Character:
         updated_res = await (
             await self.db.execute(
                 """
@@ -38,7 +38,7 @@ class CharacterRepo:
         if not updated_res:
             raise CharacterNotFoundException(f"Cannot find character with id {character_id}")
 
-    async def update_temporary_hitpoints(self, character_id: int): ...
+        return await self.get_character(character_id=character_id)
 
     async def get_character(self, character_id: int):
         character_res = await (
@@ -97,7 +97,7 @@ class CharacterRepo:
             await (
                 await self.db.execute(
                     """
-                    SELECT lower(damage_type) as type, defense_type as defense
+                    SELECT damage_type as type, defense_type as defense
                     FROM operational.character_defense
                     WHERE character_id = %(id)s
                     """,

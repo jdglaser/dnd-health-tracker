@@ -1,11 +1,14 @@
 import psycopg
 import pytest
+from psycopg import AsyncCursor
 
+from src.character.character_repo import CharacterRepo
+from src.character.character_service import CharacterService
 from src.db import get_conn_info, insert_test_data, migrate_db, teardown_db
 from src.utils import dict_row_camel
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 async def db():
     await teardown_db()
     await migrate_db()
@@ -16,3 +19,13 @@ async def db():
             yield cur
 
     await teardown_db()
+
+
+@pytest.fixture
+def character_repo(db: AsyncCursor):
+    return CharacterRepo(db)
+
+
+@pytest.fixture
+def character_service(character_repo: CharacterRepo, db: AsyncCursor):
+    return CharacterService(character_repo=character_repo, db=db)

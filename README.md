@@ -9,6 +9,19 @@ Allows clients to:
 + **Heal Hit Points**
 + **Add Temporary Hit Points**
 
+## Tools, Libraries, and Frameworks
+
+|   |   |
+|---|---|
+|**Language**|[Python 3.12](https://www.python.org/downloads/release/python-3122/)|
+|**Web Framework**|[Litestar](https://litestar.dev/)|
+|**Database**|[Postgres](https://www.postgresql.org/)|
+|**Containerization**|[Docker](https://www.docker.com/)|
+|**Testing**|[pytest](https://docs.pytest.org/en/8.0.x/)|
+|**Type Checking**|[pyright](https://github.com/microsoft/pyright)|
+|**Linting**|[Flake8](https://flake8.pycqa.org/en/latest/)|
+|**CI/CD**|[GitHub Actions](https://github.com/features/actions)|
+
 ## Running the API Locally
 
 ### With Docker

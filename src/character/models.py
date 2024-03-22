@@ -31,7 +31,7 @@ class Item(msgspec.Struct, frozen=True, kw_only=True, rename="camel"):
     modifier: ItemModifier
 
 
-class DamageType(CaseInsensitiveEnum):
+class DamageType(str, CaseInsensitiveEnum):
     BLUDGEONING = "bludgeoning"
     PIERCING = "piercing"
     SLASHING = "slashing"
@@ -47,7 +47,7 @@ class DamageType(CaseInsensitiveEnum):
     FORCE = "force"
 
 
-class DefenseType(CaseInsensitiveEnum):
+class DefenseType(str, CaseInsensitiveEnum):
     RESISTANCE = "resistance"
     IMMUNITY = "immunity"
 

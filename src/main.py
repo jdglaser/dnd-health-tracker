@@ -15,7 +15,7 @@ from src.common.log_config import get_logger
 LOG = get_logger(__name__)
 
 
-# Define health route for checking server status
+# Define health check route for checking server status
 @get("/health")
 async def health() -> dict[str, Any]:
     return {"status": "pass", "description": "Application is healthy", "environment": app_config.ENV}

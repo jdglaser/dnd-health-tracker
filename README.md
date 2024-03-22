@@ -6,7 +6,7 @@ A health tracker REST API for D&D.
 
 Allows clients to:
 + **Deal Damage** of a specific damage type taking into account damage resistance and immunity as well as temporary hit points
-+ **Heal hit points**
++ **Heal Hit Points**
 + **Add Temporary Hit Points**
 
 ## Running the API Locally
@@ -25,18 +25,18 @@ Allows clients to:
 4. Create a virtualenv by running `python3.12 -m venv .venv`
 5. Activate the virtualenv with `source ./.venv/bin/activate`
 6. Install requirements with `pip install -r requirements_dev.txt`
-7. Startup local Postgres database with `docker compose up db -d`
-8. Start the server by running `python -m src.main`
+7. Startup the local Postgres database with `docker compose up db -d`
+8. Start the API server by running `python -m src.main`
 
 ## Interacting with the API locally
 
 Once you have the API running locally with one of the [methods mentioned above](#running-the-api-locally), you can
 + view the OpenAPI docs at http://localhost:3000/api/v1/docs
-+ view interactive swagger docs at http://localhost:3000/api/v1/docs/swagger
++ view the interactive swagger docs at http://localhost:3000/api/v1/docs/swagger
 
 ## Test Coverage
 
-Unit and integrations tests are primarily focused on the `character/hit-points` endpoints.
+Unit and integration tests are primarily focused on the `character/hit-points` endpoints.
 + Unit tests for database methods can be found in [tests/test_character_repo.py](tests/test_character_repo.py)
 + Unit tests for service methods can be found in [tests/test_character_service.py](tests/test_character_service.py)
 + Integration tests for controller methods can be found in [tests/test_character_controller.py](tests/test_character_controller.py)
@@ -49,10 +49,10 @@ Unit and integrations tests are primarily focused on the `character/hit-points` 
 
 ## GitHub Actions
 
-A few basic CI/CD steps exist in GitHub actions. The definition of the actions can be found in [.github/workflows/validate.yml](.github/workflows/validate.yml).
+A few basic CI/CD steps exist for this project in GitHub actions. The definition of the actions can be found in [.github/workflows/validate.yml](.github/workflows/validate.yml).
 
 On every push to a branch and all pull requests, the following jobs will run:
-+ `unit-tests` - spins up the test postgres database and runs the full unit test suite
++ `unit-tests` - spins up the test postgres database and runs the full test suite
 + `lint` - Runs linting on the codebase using [flake8](https://flake8.pycqa.org/en/latest/)
 + `type-check` - Runs static type checking on the codebase using [pyright](https://github.com/microsoft/pyright)
 

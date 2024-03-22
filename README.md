@@ -78,6 +78,10 @@ On every push to a branch and all pull requests, the following jobs will run:
 You can view the latest run of the CI/CD pipeline here:
 [![Test, Lint, and Type Check](https://github.com/jdglaser/dnd-health-tracker/actions/workflows/validate.yml/badge.svg)](https://github.com/jdglaser/dnd-health-tracker/actions/workflows/validate.yml)
 
+## Logging
+
+If the [environment](https://github.com/jdglaser/dnd-health-tracker/blob/main/src/common/app_config.py#L8) is anything other than `LOCAL_DEV`, then application logs will use the custom `StructuredFormatter` class to output logs as JSON objects for better parsing by logging monitoring tools. Otherwise, logs will use the `ColorFormatter` class for more human-readable logs.
+
 ## Contact
 
 For more information or questions, please reach out to [Jarred Glaser](mailto:jarred.glaser@gmail.com).

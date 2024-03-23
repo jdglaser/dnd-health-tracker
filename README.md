@@ -49,7 +49,7 @@ Once you have the API running locally with one of the [methods mentioned above](
 
 ### Local test data
 
-If the app is running in a [local environment](https://github.com/jdglaser/dnd-health-tracker/blob/main/src/common/app_config.py#L9), every time the app starts up it runs DDL and loads the [briv.json](briv.json) data into the database using the [migrations/setup.sql](migrations/setup.sql) script and the methods in the [src/character/character_controller.py](src/character/character_controller.py) class. Additionally, whenever the app shuts down, the database will be torn down using the [migrations/teardown.sql](migrations/teardown.sql) script.
+If the app is running in a [local environment](https://github.com/jdglaser/dnd-health-tracker/blob/main/src/common/app_config.py#L9), every time the app starts up it runs DDL and loads the [briv.json](briv.json) data into the database using the [migrations/setup.sql](migrations/setup.sql) script and the methods in the [src/character/character_repo.py](src/character/character_repo.py) class. Additionally, whenever the app shuts down, the database will be torn down using the [migrations/teardown.sql](migrations/teardown.sql) script.
 
 Normally, in a real app, we'd use a database migration tool like [Flyway](https://flywaydb.org/) to handle migrations.
 
